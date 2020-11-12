@@ -68,6 +68,23 @@ func UpdateSymbolPrice(symbols []string) error {
 		updateData := make(map[string]interface{})
 		updateData["price"] = v.Quote["USD"].Price
 		models.UpdateSymbolPrice(k, updateData)
+		snapshotData := map[string]interface{}{
+				"name" : k,
+				"price":v.Quote["USD"].Price,
+			}
+		AddSymbolPriceSnapshot(snapshotData)
+	}
+	return nil
+}
+
+func AddSymbolPriceSnapshot(data map[string]interface{}) error{
+	s := models.SymbolPriceSnapshot{
+		Name: data["name"].(string),
+		Price: data["price"].(float64),
+	}
+	if err := models.AddSymbolPriceSnapshot(&s);err!=nil{
+		logging.Error(err)
+		return err
 	}
 	return nil
 }

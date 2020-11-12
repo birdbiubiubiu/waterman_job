@@ -13,3 +13,4 @@ func (uspj UpdateSymbolPriceJob) Run() {
 	logging.Info("execute" + uspj.Name)
 	cmc_service.UpdateSymbolPrice([]string{"BTC", "ETH", "BNB", "CAKE", "DOT", "FARM", "SUSHI"})
 }
+

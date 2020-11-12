@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/robfig/cron/v3"
+	"waterman_job/jobs/cmc_jobs"
 	"waterman_job/models"
 	"waterman_job/pkg/logging"
 	"waterman_job/pkg/setting"
@@ -13,10 +15,9 @@ func init()  {
 }
 
 func main()  {
-	logging.Error(111)
-	//c := cron.New()
-	//c.AddJob("@every 1s", cmc_jobs.UpdateSymbolPriceJob{"11"})
-	//c.Start()
-	//
-	//time.Sleep(5 * time.Second)
+	c := cron.New()
+	c.AddJob("*/5 * * * ?", cmc_jobs.UpdateSymbolPriceJob{"update symbol price from cmc"})
+	c.Start()
+	select {}
+
 }
