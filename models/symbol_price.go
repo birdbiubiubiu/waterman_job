@@ -1,6 +1,9 @@
 package models
 
-import "waterman_job/pkg/logging"
+import (
+	"gorm.io/gorm"
+	"waterman_job/pkg/logging"
+)
 
 type SymbolPrice struct {
 	Model
@@ -21,3 +24,11 @@ func UpdateSymbolPrice(name string, data map[string]interface{}) error {
 	return nil
 }
 
+func GetSymbolPrice(where map[string]interface{}) (*SymbolPrice,error)  {
+	var s SymbolPrice
+	err := db.Where(where).Find(&s).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+	return &s, nil
+}

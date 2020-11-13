@@ -2,7 +2,9 @@ package etherscan_jobs
 
 import (
 	"fmt"
+	"math/big"
 	"waterman_job/pkg/e"
+	"waterman_job/pkg/logging"
 	"waterman_job/pkg/tools"
 	"waterman_job/service/etherscan_service"
 	"waterman_job/service/pair_service"
@@ -10,6 +12,7 @@ import (
 
 type UniJob struct {
 	Name string
+	Token0Name string
 }
 
 func(j UniJob) getParams() map[string]interface{} {
@@ -38,17 +41,17 @@ func(j UniJob) getParams() map[string]interface{} {
 			params["token0Address"]     = e.UNI_ETH_TOKEN_ADDRESS
 			params["token1Address"]     = e.UNI_USDC_TOKEN_ADDRESS
 			params["lpDecimals"]	    = int32(18)
-			params["token0Decimals"]    = int32(6)
-			params["token1Decimals"]    = int32(18)
+			params["token0Decimals"]    = int32(18)
+			params["token1Decimals"]    = int32(6)
 			params["platformId"]        = 1
 			params["apiKey"]			= e.API_KEY4
-	case "ETH-USDT":
-			params["lpContractAddress"] = e.UNI_USDT_TOKEN_ADDRESS
+		case "ETH-USDT":
+			params["lpContractAddress"] = e.UNI_ETH_USDT_CONTRACT_ADDRESS
 			params["token0Address"]     = e.UNI_ETH_TOKEN_ADDRESS
 			params["token1Address"]     = e.UNI_USDT_TOKEN_ADDRESS
 			params["lpDecimals"]	    = int32(18)
-			params["token0Decimals"]    = int32(6)
-			params["token1Decimals"]    = int32(18)
+			params["token0Decimals"]    = int32(18)
+			params["token1Decimals"]    = int32(6)
 			params["platformId"]        = 1
 			params["apiKey"]			= e.API_KEY2
 	}
@@ -56,7 +59,7 @@ func(j UniJob) getParams() map[string]interface{} {
 }
 
 func (j UniJob) Run()  {
-	fmt.Println(j.Name)
+	logging.Info(fmt.Sprintf("get %s lp info", j.Name))
 	params := j.getParams()
 	supply, err := etherscan_service.GetTokenSupply(params["lpContractAddress"].(string))
 	if err != nil {
@@ -76,7 +79,16 @@ func (j UniJob) Run()  {
 	}
 	ethBalance = tools.BigIntStrToFloatStr(ethBalance, params["token1Decimals"].(int32))
 
-	pair := pair_service.Pair{Name: j.Name, PlatformId: params["platformId"].(int), LpTotalSupply: supply, Token0Amount: wBtcBalance, Token1Amount: ethBalance}
+	n := new(big.Float)
+	n.SetString(wBtcBalance)
+	p := new(big.Float).Quo(big.NewFloat(1), n)
+	aa, _ := p.Float64()
+	apy, err:= pair_service.CalculateAPY(aa, j.Token0Name, "uniswap")
+	if err!=nil {
+		logging.Error(err)
+		return
+	}
+	pair := pair_service.Pair{Apy:apy, Name: j.Name, PlatformId: params["platformId"].(int), LpTotalSupply: supply, Token0Amount: wBtcBalance, Token1Amount: ethBalance}
 
 	err = pair.UpdatePair()
 	if err != nil {
