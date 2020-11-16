@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"github.com/robfig/cron/v3"
+	"github.com/slack-go/slack"
 	"waterman_job/jobs/cmc_jobs"
 	"waterman_job/jobs/etherscan_jobs"
 	"waterman_job/models"
@@ -25,5 +27,4 @@ func main()  {
 
 	c.Start()
 	select {}
-
 }
