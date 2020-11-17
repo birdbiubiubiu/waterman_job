@@ -38,9 +38,9 @@ func GetWhales(maps interface{}) (*Whales, error) {
 	return &w, err
 }
 
-func GetLastWhales() (*Whales, error) {
+func GetLastWhalesByAction(action string) (*Whales, error) {
 	var w Whales
-	err := db.Limit(1).Order("timestamp desc").Find(&w).Error
+	err := db.Limit(1).Order("timestamp desc").Where("action = ?", action).Find(&w).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err
 	}

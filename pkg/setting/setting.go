@@ -60,6 +60,13 @@ type Redis struct {
 
 var RedisSetting = &Redis{}
 
+type Slack struct {
+	Token string
+	BridgeChannelId string
+}
+
+var SlackSetting = &Slack{}
+
 var cfg *ini.File
 
 // Setup initialize the configuration instance
@@ -74,6 +81,7 @@ func Setup() {
 	mapTo("server", ServerSetting)
 	mapTo("database", DatabaseSetting)
 	mapTo("redis", RedisSetting)
+	mapTo("slack", SlackSetting)
 
 	AppSetting.ImageMaxSize = AppSetting.ImageMaxSize * 1024 * 1024
 	ServerSetting.ReadTimeout = ServerSetting.ReadTimeout * time.Second

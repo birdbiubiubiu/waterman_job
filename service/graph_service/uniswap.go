@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"strconv"
 	"waterman_job/models"
+	"waterman_job/pkg/logging"
+	"waterman_job/service/slack_service"
 )
 
 type Variables struct {
@@ -17,9 +19,10 @@ type Variables struct {
 	Offset 		  int `json:"offset"`
 }
 
-type UniswapGraphql struct {
+type UniSwapGraphql struct {
 	Variables Variables `json:"variables"`
 	Query string `json:"query"`
+	Action string `json:"-"`
 }
 
 type Mints struct {
@@ -46,16 +49,14 @@ type Result struct {
 	Data map[string][]Mints `json:"data"`
 }
 
-func (u UniswapGraphql) Get() {
-	url := "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2"
-	fmt.Println("URL:>", url)
+var url = "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2"
 
+func (u UniSwapGraphql) Get() {
 	jsonStr, err := json.Marshal(u)
 	if err != nil {
-		fmt.Println(1111)
+		logging.Error(err)
+		fmt.Println(err)
 	}
-	fmt.Println(string(jsonStr))
-
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 
@@ -65,9 +66,6 @@ func (u UniswapGraphql) Get() {
 		panic(err)
 	}
 	defer resp.Body.Close()
-
-	fmt.Println("response Status:", resp.Status)
-	fmt.Println("response Headers:", resp.Header)
 	body, _ := ioutil.ReadAll(resp.Body)
 	r := &Result{}
 	json.Unmarshal(body, &r)
@@ -83,13 +81,61 @@ func (u UniswapGraphql) Get() {
 				AmountUsd: au,
 				Amount0: a0,
 				Amount1: a1,
-				Action: "add",
+				Action: u.Action,
 				TransactionId: av.Transaction.ID,
 				Timestamp: t,
 			}
-			models.AddWhales(&w)
-			fmt.Println(av.Timestamp)
-			fmt.Println(av.Amount0)
+			slack_service.UniSwapWhaleCh <- &w
+
+			if err := models.AddWhales(&w);err!=nil {
+				logging.Error(err)
+			}
 		}
 	}
+}
+
+func (u UniSwapGraphql) GetSwaps() {
+	jsonStr, err := json.Marshal(u)
+	if err != nil {
+		logging.Error(err)
+		fmt.Println(err)
+	}
+	fmt.Println(string(jsonStr))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	if err != nil {
+		logging.Error(err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	r := &Result{}
+	json.Unmarshal(body, &r)
+	for _, v := range r.Data{
+		for _,av := range v {
+			t,_ := strconv.Atoi(av.Timestamp)
+			a0,_  := strconv.ParseFloat(av.Amount0, 64)
+			a1,_  := strconv.ParseFloat(av.Amount1, 64)
+			au,_ :=strconv.ParseFloat(av.AmountUSD, 64)
+			w := models.Whales{
+				Token0: av.Pair.Token0.Symbol,
+				Token1: av.Pair.Token1.Symbol,
+				AmountUsd: au,
+				Amount0: a0,
+				Amount1: a1,
+				Action: u.Action,
+				TransactionId: av.Transaction.ID,
+				Timestamp: t,
+			}
+			if err := models.AddWhales(&w);err!=nil {
+				logging.Error(err)
+			}
+		}
+	}
+
 }
