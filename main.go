@@ -19,10 +19,10 @@ func main() {
 
 	c := cron.New()
 	go slack_service.LiquidityAlert()
-	c.AddJob("@every 1m", graph_jobs.UniSwapGraphql{Action: "burn"})
-	c.AddJob("@every 1m", graph_jobs.UniSwapGraphql{Action: "mint"})
-	c.AddJob("@every 1m", graph_jobs.SushiSwapGraphql{Action: "mint"})
-	c.AddJob("@every 1m", graph_jobs.SushiSwapGraphql{Action: "mint"})
+	c.AddJob("@every 10s", graph_jobs.UniSwapGraphql{Action: "burn"})
+	c.AddJob("@every 10s", graph_jobs.UniSwapGraphql{Action: "mint"})
+	c.AddJob("@every 10s", graph_jobs.SushiSwapGraphql{Action: "mint"})
+	c.AddJob("@every 10s", graph_jobs.SushiSwapGraphql{Action: "mint"})
 
 	//c.AddJob("*/5 * * * ?", cmc_jobs.UpdateSymbolPriceJob{Name :"update symbol price from cmc"})
 	//c.AddJob("@every 10s", etherscan_jobs.UniJob{Name:"WBTC-ETH", Token0Name: "BTC"})
