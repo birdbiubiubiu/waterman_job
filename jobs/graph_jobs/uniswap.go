@@ -17,11 +17,11 @@ func (u UniSwapGraphql) Run() {
 	query := ""
 	switch u.Action {
 	case "mint":
-		query = "query($allPairs: [Bytes]!,$lastTimestamp :BigInt!, $first :Int!){mints(first:$first, orderBy: timestamp, orderDirection: asc,where:{pair_in: $allPairs,timestamp_gt:$lastTimestamp,amountUSD_gt:500000}){pair{token0{symbol},token1{symbol}},amountUSD,id,amount0,amount1,timestamp,transaction{id,timestamp}}}"
+		query = "query($allPairs: [Bytes]!,$lastTimestamp :BigInt!, $first :Int!){mints(first:$first, orderBy: timestamp, orderDirection: asc,where:{pair_in: $allPairs,timestamp_gt:$lastTimestamp,amountUSD_gt:100000}){pair{token0{symbol},token1{symbol}},amountUSD,id,amount0,amount1,timestamp,transaction{id,timestamp}}}"
 	case "burn":
-		query = "query($allPairs: [Bytes]!,$lastTimestamp :BigInt!, $first :Int!){burns(first:$first, orderBy: timestamp, orderDirection: asc,where:{pair_in: $allPairs,timestamp_gt:$lastTimestamp,amountUSD_gt:500000}){pair{token0{symbol},token1{symbol}},amountUSD,id,amount0,amount1,timestamp,transaction{id,timestamp}}}"
+		query = "query($allPairs: [Bytes]!,$lastTimestamp :BigInt!, $first :Int!){burns(first:$first, orderBy: timestamp, orderDirection: asc,where:{pair_in: $allPairs,timestamp_gt:$lastTimestamp,amountUSD_gt:100000}){pair{token0{symbol},token1{symbol}},amountUSD,id,amount0,amount1,timestamp,transaction{id,timestamp}}}"
 	case "swap":
-		query = "query($allPairs: [Bytes]!,$lastTimestamp :BigInt!, $first :Int!){swaps(first:$first, orderBy: timestamp, orderDirection: asc,where:{pair_in: $allPairs,timestamp_gt:$lastTimestamp,amountUSD_gt:500000}){pair{token0{symbol},token1{symbol}},amountUSD,id,amount0,amount1,timestamp,transaction{id,timestamp}}}"
+		query = "query($allPairs: [Bytes]!,$lastTimestamp :BigInt!, $first :Int!){swaps(first:$first, orderBy: timestamp, orderDirection: asc,where:{pair_in: $allPairs,timestamp_gt:$lastTimestamp,amountUSD_gt:100000}){pair{token0{symbol},token1{symbol}},amountUSD,id,amount0,amount1,timestamp,transaction{id,timestamp}}}"
 	}
 
 	if err != nil {
