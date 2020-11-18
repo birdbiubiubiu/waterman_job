@@ -61,7 +61,7 @@ type Redis struct {
 var RedisSetting = &Redis{}
 
 type Slack struct {
-	Token string
+	Token           string
 	BridgeChannelId string
 }
 

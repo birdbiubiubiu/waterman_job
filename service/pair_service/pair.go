@@ -8,7 +8,7 @@ import (
 type Pair struct {
 	ID            int
 	Name          string
-	Apy			  float64
+	Apy           float64
 	PlatformId    int
 	LpTotalSupply string
 	Token0Amount  string
@@ -27,14 +27,14 @@ func (p *Pair) UpdatePair() error {
 		return updateErr
 	}
 	snapshotData := map[string]interface{}{
-		"name":p.Name,
-		"platformId":p.PlatformId,
-		"lpTotalSupply":p.LpTotalSupply,
-		"token0Amount":p.Token0Amount,
-		"token1Amount":p.Token1Amount,
-		"apy":p.Apy,
+		"name":          p.Name,
+		"platformId":    p.PlatformId,
+		"lpTotalSupply": p.LpTotalSupply,
+		"token0Amount":  p.Token0Amount,
+		"token1Amount":  p.Token1Amount,
+		"apy":           p.Apy,
 	}
-	if err := models.AddPairSnapshot(snapshotData);err!=nil {
+	if err := models.AddPairSnapshot(snapshotData); err != nil {
 		logging.Error(err)
 		return err
 	}
@@ -87,17 +87,17 @@ func (p *Pair) getUpdateMaps() map[string]interface{} {
 func CalculateAPY(proportion float64, token0Name, platform string) (float64, error) {
 	if platform == "uniswap" {
 		where := map[string]interface{}{
-			"name":"UNI",
+			"name": "UNI",
 		}
 		symbolPrice, err := models.GetSymbolPrice(where)
 		whereToken := map[string]interface{}{
-			"name":token0Name,
+			"name": token0Name,
 		}
 		uniPrice := symbolPrice.Price
 		dailyUniValue := uniPrice * 583333 / 7
 		token0Price, err := models.GetSymbolPrice(whereToken)
 		if err != nil {
-			return 0.0 , err
+			return 0.0, err
 		}
 		basePrice := token0Price.Price
 		rewardValue := proportion * dailyUniValue / 2
