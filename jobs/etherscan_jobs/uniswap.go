@@ -11,54 +11,54 @@ import (
 )
 
 type UniJob struct {
-	Name string
+	Name       string
 	Token0Name string
 }
 
-func(j UniJob) getParams() map[string]interface{} {
+func (j UniJob) getParams() map[string]interface{} {
 	params := make(map[string]interface{})
 	switch j.Name {
-		case "WBTC-ETH":
-			params["lpContractAddress"] = e.UNI_WBTC_ETH_CONTRACT_ADDRESS
-			params["token0Address"]     = e.UNI_WBTC_TOKEN_ADDRESS
-			params["token1Address"]     = e.UNI_ETH_TOKEN_ADDRESS
-			params["lpDecimals"]	    = int32(18)
-			params["token0Decimals"]    = int32(8)
-			params["token1Decimals"]    = int32(18)
-			params["platformId"]        = 1
-			params["apiKey"]			= e.API_KEY2
-		case "ETH-DAI":
-			params["lpContractAddress"] = e.UNI_ETH_DAI_CONTRACT_ADDRESS
-			params["token0Address"]     = e.UNI_ETH_TOKEN_ADDRESS
-			params["token1Address"]     = e.UNI_DAI_TOKEN_ADDRESS
-			params["lpDecimals"]	    = int32(18)
-			params["token0Decimals"]    = int32(18)
-			params["token1Decimals"]    = int32(18)
-			params["platformId"]        = 1
-			params["apiKey"]			= e.API_KEY3
-		case "ETH-USDC":
-			params["lpContractAddress"] = e.UNI_ETH_USDC_CONTRACT_ADDRESS
-			params["token0Address"]     = e.UNI_ETH_TOKEN_ADDRESS
-			params["token1Address"]     = e.UNI_USDC_TOKEN_ADDRESS
-			params["lpDecimals"]	    = int32(18)
-			params["token0Decimals"]    = int32(18)
-			params["token1Decimals"]    = int32(6)
-			params["platformId"]        = 1
-			params["apiKey"]			= e.API_KEY4
-		case "ETH-USDT":
-			params["lpContractAddress"] = e.UNI_ETH_USDT_CONTRACT_ADDRESS
-			params["token0Address"]     = e.UNI_ETH_TOKEN_ADDRESS
-			params["token1Address"]     = e.UNI_USDT_TOKEN_ADDRESS
-			params["lpDecimals"]	    = int32(18)
-			params["token0Decimals"]    = int32(18)
-			params["token1Decimals"]    = int32(6)
-			params["platformId"]        = 1
-			params["apiKey"]			= e.API_KEY2
+	case "WBTC-ETH":
+		params["lpContractAddress"] = e.UNI_WBTC_ETH_CONTRACT_ADDRESS
+		params["token0Address"] = e.UNI_WBTC_TOKEN_ADDRESS
+		params["token1Address"] = e.UNI_ETH_TOKEN_ADDRESS
+		params["lpDecimals"] = int32(18)
+		params["token0Decimals"] = int32(8)
+		params["token1Decimals"] = int32(18)
+		params["platformId"] = 1
+		params["apiKey"] = e.API_KEY2
+	case "ETH-DAI":
+		params["lpContractAddress"] = e.UNI_ETH_DAI_CONTRACT_ADDRESS
+		params["token0Address"] = e.UNI_ETH_TOKEN_ADDRESS
+		params["token1Address"] = e.UNI_DAI_TOKEN_ADDRESS
+		params["lpDecimals"] = int32(18)
+		params["token0Decimals"] = int32(18)
+		params["token1Decimals"] = int32(18)
+		params["platformId"] = 1
+		params["apiKey"] = e.API_KEY3
+	case "ETH-USDC":
+		params["lpContractAddress"] = e.UNI_ETH_USDC_CONTRACT_ADDRESS
+		params["token0Address"] = e.UNI_ETH_TOKEN_ADDRESS
+		params["token1Address"] = e.UNI_USDC_TOKEN_ADDRESS
+		params["lpDecimals"] = int32(18)
+		params["token0Decimals"] = int32(18)
+		params["token1Decimals"] = int32(6)
+		params["platformId"] = 1
+		params["apiKey"] = e.API_KEY4
+	case "ETH-USDT":
+		params["lpContractAddress"] = e.UNI_ETH_USDT_CONTRACT_ADDRESS
+		params["token0Address"] = e.UNI_ETH_TOKEN_ADDRESS
+		params["token1Address"] = e.UNI_USDT_TOKEN_ADDRESS
+		params["lpDecimals"] = int32(18)
+		params["token0Decimals"] = int32(18)
+		params["token1Decimals"] = int32(6)
+		params["platformId"] = 1
+		params["apiKey"] = e.API_KEY2
 	}
 	return params
 }
 
-func (j UniJob) Run()  {
+func (j UniJob) Run() {
 	logging.Info(fmt.Sprintf("get %s lp info", j.Name))
 	params := j.getParams()
 	supply, err := etherscan_service.GetTokenSupply(params["lpContractAddress"].(string))
@@ -83,12 +83,12 @@ func (j UniJob) Run()  {
 	n.SetString(wBtcBalance)
 	p := new(big.Float).Quo(big.NewFloat(1), n)
 	aa, _ := p.Float64()
-	apy, err:= pair_service.CalculateAPY(aa, j.Token0Name, "uniswap")
-	if err!=nil {
+	apy, err := pair_service.CalculateAPY(aa, j.Token0Name, "uniswap")
+	if err != nil {
 		logging.Error(err)
 		return
 	}
-	pair := pair_service.Pair{Apy:apy, Name: j.Name, PlatformId: params["platformId"].(int), LpTotalSupply: supply, Token0Amount: wBtcBalance, Token1Amount: ethBalance}
+	pair := pair_service.Pair{Apy: apy, Name: j.Name, PlatformId: params["platformId"].(int), LpTotalSupply: supply, Token0Amount: wBtcBalance, Token1Amount: ethBalance}
 
 	err = pair.UpdatePair()
 	if err != nil {

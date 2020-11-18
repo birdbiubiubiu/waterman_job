@@ -12,19 +12,19 @@ import (
 	"waterman_job/service/slack_service"
 )
 
-type UniSwapGraphql struct {
+type SushiSwapGraphql struct {
 	Variables Variables `json:"variables"`
 	Query     string    `json:"query"`
 	Action    string    `json:"-"`
 }
 
-func (u UniSwapGraphql) Get() {
-	jsonStr, err := json.Marshal(u)
+func (s SushiSwapGraphql) Get() {
+	jsonStr, err := json.Marshal(s)
 	if err != nil {
 		logging.Error(err)
 		fmt.Println(err)
 	}
-	req, err := http.NewRequest("POST", UniSwapUrl, bytes.NewBuffer(jsonStr))
+	req, err := http.NewRequest("POST", SushiSwapUrl, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -48,9 +48,9 @@ func (u UniSwapGraphql) Get() {
 				AmountUsd:     au,
 				Amount0:       a0,
 				Amount1:       a1,
-				Action:        u.Action,
+				Action:        s.Action,
+				Platform:      PlatformSushiSwap,
 				TransactionId: av.Transaction.ID,
-				Platform:      PlatformUniSwap,
 				Timestamp:     t,
 			}
 

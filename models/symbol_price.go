@@ -8,7 +8,7 @@ import (
 type SymbolPrice struct {
 	Model
 
-	Name   string `json:"name"`
+	Name  string  `json:"name"`
 	Price float64 `json:"price"`
 }
 
@@ -24,7 +24,7 @@ func UpdateSymbolPrice(name string, data map[string]interface{}) error {
 	return nil
 }
 
-func GetSymbolPrice(where map[string]interface{}) (*SymbolPrice,error)  {
+func GetSymbolPrice(where map[string]interface{}) (*SymbolPrice, error) {
 	var s SymbolPrice
 	err := db.Where(where).Find(&s).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
