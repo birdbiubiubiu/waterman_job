@@ -3,7 +3,6 @@ package graph_service
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -22,7 +21,7 @@ func (u UniSwapGraphql) Get() {
 	jsonStr, err := json.Marshal(u)
 	if err != nil {
 		logging.Error(err)
-		fmt.Println(err)
+		return
 	}
 	req, err := http.NewRequest("POST", UniSwapUrl, bytes.NewBuffer(jsonStr))
 	req.Header.Set("Content-Type", "application/json")
@@ -55,6 +54,7 @@ func (u UniSwapGraphql) Get() {
 			}
 
 			if err := models.AddWhales(&w); err != nil {
+				logging.Error(w)
 				logging.Error(err)
 			} else {
 				slack_service.SwapWhaleCh <- &w
